@@ -3,7 +3,7 @@ import { cn } from '@/lib/utils'
 export function FillerTabBar() {
   const tabs = [
     { label: 'Website', isActive: true },
-    { label: 'Librarian of Congress', isActive: false },
+    { label: 'Library of Congress', isActive: false },
     { label: 'Speech', isActive: false },
     { label: 'Authors Notes', isActive: false },
   ]

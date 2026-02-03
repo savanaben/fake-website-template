@@ -355,7 +355,10 @@ export function LayerManager({
   isCollapsed = false,
   onToggleCollapse,
 }: LayerManagerProps) {
-  const handleDropOnRoot = (e: React.DragEvent) => {
+  const [dragOverTopZone, setDragOverTopZone] = useState(false)
+  const [dragOverBottomZone, setDragOverBottomZone] = useState(false)
+
+  const handleDropOnRoot = (e: React.DragEvent, targetIndex?: number) => {
     e.preventDefault()
     const draggedComponentId = e.dataTransfer.getData('componentId')
     const draggedComponentType = e.dataTransfer.getData('componentType') as ComponentType
@@ -363,11 +366,13 @@ export function LayerManager({
     // Check if this is a new component from palette or existing component
     if (draggedComponentType && !draggedComponentId) {
       // New component from palette - add to root
-      onAddComponent(draggedComponentType, undefined, components.length)
+      onAddComponent(draggedComponentType, undefined, targetIndex !== undefined ? targetIndex : components.length)
     } else if (draggedComponentId) {
       // Existing component - move to root
-      onMoveComponent(draggedComponentId, null, components.length)
+      onMoveComponent(draggedComponentId, null, targetIndex !== undefined ? targetIndex : components.length)
     }
+    setDragOverTopZone(false)
+    setDragOverBottomZone(false)
   }
 
   if (isCollapsed) {
@@ -429,35 +434,92 @@ export function LayerManager({
             No components yet
           </div>
         ) : (
-          <div
-            onDragOver={(e) => {
-              e.preventDefault()
-              e.dataTransfer.dropEffect = 'move'
-            }}
-            onDrop={handleDropOnRoot}
-            className="space-y-1"
-          >
-            {/* Sort: enabled components first, disabled components last */}
-            {[...components]
-              .sort((a, b) => {
-                const aEnabled = a.props.enabled !== false
-                const bEnabled = b.props.enabled !== false
-                if (aEnabled === bEnabled) return 0
-                return aEnabled ? -1 : 1
-              })
-              .map((component, index) => (
-                <LayerItem
-                  key={component.id}
-                  component={component}
-                  selectedComponentId={selectedComponentId}
-                  onSelect={onSelectComponent}
-                  onMove={onMoveComponent}
-                  onAdd={onAddComponent}
-                  level={0}
-                  index={index}
-                  parentId={null}
-                />
-              ))}
+          <div className="space-y-1">
+            {/* Drop zone above first item */}
+            <div
+              onDragOver={(e) => {
+                e.preventDefault()
+                e.stopPropagation()
+                e.dataTransfer.dropEffect = 'move'
+                setDragOverTopZone(true)
+              }}
+              onDragLeave={(e) => {
+                e.preventDefault()
+                e.stopPropagation()
+                setDragOverTopZone(false)
+              }}
+              onDrop={(e) => {
+                e.preventDefault()
+                e.stopPropagation()
+                handleDropOnRoot(e, 0)
+              }}
+              className={cn(
+                "min-h-[40px] border-2 border-dashed rounded mx-2 my-1 flex items-center justify-center text-xs transition-colors",
+                dragOverTopZone
+                  ? "border-[#2478CC] text-[#2478CC] bg-[rgba(36,120,204,0.05)]"
+                  : "border-transparent text-gray-400 hover:border-gray-300"
+              )}
+            >
+              Drop here to move to root
+            </div>
+            
+            <div
+              onDragOver={(e) => {
+                e.preventDefault()
+                e.dataTransfer.dropEffect = 'move'
+              }}
+              onDrop={handleDropOnRoot}
+            >
+              {/* Sort: enabled components first, disabled components last */}
+              {[...components]
+                .sort((a, b) => {
+                  const aEnabled = a.props.enabled !== false
+                  const bEnabled = b.props.enabled !== false
+                  if (aEnabled === bEnabled) return 0
+                  return aEnabled ? -1 : 1
+                })
+                .map((component, index) => (
+                  <LayerItem
+                    key={component.id}
+                    component={component}
+                    selectedComponentId={selectedComponentId}
+                    onSelect={onSelectComponent}
+                    onMove={onMoveComponent}
+                    onAdd={onAddComponent}
+                    level={0}
+                    index={index}
+                    parentId={null}
+                  />
+                ))}
+            </div>
+            
+            {/* Drop zone below last item */}
+            <div
+              onDragOver={(e) => {
+                e.preventDefault()
+                e.stopPropagation()
+                e.dataTransfer.dropEffect = 'move'
+                setDragOverBottomZone(true)
+              }}
+              onDragLeave={(e) => {
+                e.preventDefault()
+                e.stopPropagation()
+                setDragOverBottomZone(false)
+              }}
+              onDrop={(e) => {
+                e.preventDefault()
+                e.stopPropagation()
+                handleDropOnRoot(e, components.length)
+              }}
+              className={cn(
+                "min-h-[40px] border-2 border-dashed rounded mx-2 my-1 flex items-center justify-center text-xs transition-colors",
+                dragOverBottomZone
+                  ? "border-[#2478CC] text-[#2478CC] bg-[rgba(36,120,204,0.05)]"
+                  : "border-transparent text-gray-400 hover:border-gray-300"
+              )}
+            >
+              Drop here to move to root
+            </div>
           </div>
         )}
         </div>

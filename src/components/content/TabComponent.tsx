@@ -35,7 +35,7 @@ export function TabComponent({ tabs, activeTabId, onTabChange, className, style 
         <div className={cn('relative', stickyClasses)} style={{ height: '64px', paddingTop: '8px', paddingLeft: '8px', paddingRight: '8px', ...stickyWrapperStyle }}>
           <div className="flex items-end" style={{ height: '100%' }}>
             {iconUrl && (
-              <div className="flex items-center mr-2" style={{ height: '100%', paddingBottom: '8px' }}>
+              <div className="flex items-center" style={{ height: '100%', paddingBottom: '8px', paddingRight: '16px' }}>
                 <IconImage iconUrl={iconUrl} iconAlt={iconAlt || 'Tab icon'} />
               </div>
             )}
@@ -108,9 +108,9 @@ export function TabComponent({ tabs, activeTabId, onTabChange, className, style 
   // Line style (default)
   return (
     <div className={cn('w-full', className)}>
-      <div className={cn('flex border-b border-gray-300', stickyClasses)} style={{ minHeight: '55px', ...stickyWrapperStyle }}>
+      <div className={cn('flex border-b border-[#afafaf]', stickyClasses)} style={{ minHeight: '55px', ...stickyWrapperStyle }}>
         {iconUrl && (
-          <div className="flex items-center px-3 self-stretch" style={{ paddingTop: '12px', paddingBottom: '12px' }}>
+          <div className="flex items-center self-stretch" style={{ paddingTop: '12px', paddingBottom: '12px', paddingLeft: '16px', paddingRight: '16px' }}>
             <IconImage iconUrl={iconUrl} iconAlt={iconAlt || 'Tab icon'} />
           </div>
         )}
@@ -130,20 +130,24 @@ export function TabComponent({ tabs, activeTabId, onTabChange, className, style 
                 }}
                 disabled={!isEnabled}
                 className={cn(
-                  'px-3 text-base transition-colors flex items-center',
+                  'text-base transition-colors flex items-center',
                   'border-b-2',
-                  !isEnabled && 'opacity-50 cursor-not-allowed',
+                  !isEnabled && 'cursor-not-allowed',
                   isEnabled && 'font-bold',
                   isActive && isEnabled && 'border-b-4'
                 )}
-                style={isEnabled ? {
-                  color: '#2478CC',
-                  borderBottomColor: isActive ? '#2478CC' : 'transparent',
-                  lineHeight: 'normal',
-                } : {
-                  color: '#3C3C3C',
-                  borderBottomColor: 'transparent',
-                  lineHeight: 'normal',
+                style={{
+                  paddingLeft: '16px',
+                  paddingRight: '16px',
+                  ...(isEnabled ? {
+                    color: '#2478CC',
+                    borderBottomColor: isActive ? '#2478CC' : 'transparent',
+                    lineHeight: 'normal',
+                  } : {
+                    color: '#696969',
+                    borderBottomColor: 'transparent',
+                    lineHeight: 'normal',
+                  }),
                 }}
                 onMouseEnter={(e) => {
                   if (isEnabled && !isActive) {
@@ -170,7 +174,7 @@ export function TabComponent({ tabs, activeTabId, onTabChange, className, style 
                     style={{
                       width: '1px',
                       height: '100%',
-                      backgroundColor: '#d1d5db',
+                      backgroundColor: '#C7C7C7',
                     }}
                   />
                 </div>

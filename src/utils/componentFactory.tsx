@@ -43,8 +43,8 @@ export function renderComponent({
 
   // Determine if this component should be sticky
   const shouldBeSticky = isSticky !== undefined ? isSticky : 
-    (component.type === 'fakeURLBar' ? (component.props.isSticky || false) :
-     component.type === 'websiteHeaderBar' ? (component.props.isSticky || false) : false)
+    (component.type === 'fakeURLBar' ? (component.props.urlBarSticky || false) :
+     component.type === 'websiteHeaderBar' ? (component.props.headerBarSticky || false) : false)
   
   const stickyClasses = shouldBeSticky 
     ? (component.type === 'fakeURLBar' ? 'sticky z-[15]' : 
@@ -86,6 +86,9 @@ export function renderComponent({
             title={component.props.title || ''}
             logoUrl={component.props.logoUrl}
             logoAlt={component.props.logoAlt}
+            headingLevel={component.props.headingLevel || 'h1'}
+            titleColor={component.props.titleColor}
+            fontFamily={component.props.titleFontFamily}
           />
         </div>
       )
@@ -153,10 +156,11 @@ export function renderComponent({
 
     case 'bannerImage':
       return (
-        <div {...commonProps}>
+        <div {...commonProps} className={cn(commonProps.className, 'w-full self-stretch')} style={{ ...commonProps.style, width: '100%' }}>
           <BannerImageComponent
             src={component.props.src || ''}
             alt={component.props.alt || ''}
+            height={component.props.height}
           />
         </div>
       )
@@ -285,7 +289,7 @@ export function renderComponent({
 
     case 'websiteHeaderBar':
       return (
-        <div {...commonProps}>
+        <div {...commonProps} className={cn(commonProps.className, 'w-full self-stretch')} style={{ ...commonProps.style, width: '100%' }}>
           <WebsiteHeaderBar
             title={component.props.headerTitle || ''}
             fontFamily={component.props.headerFontFamily}
@@ -293,6 +297,8 @@ export function renderComponent({
             titleColor={component.props.headerTitleColor}
             iconUrl={component.props.headerIconUrl}
             iconAlt={component.props.headerIconAlt}
+            textAlign={component.props.headerTextAlign || 'left'}
+            headingLevel={component.props.headerHeadingLevel || 'h3'}
           />
         </div>
       )

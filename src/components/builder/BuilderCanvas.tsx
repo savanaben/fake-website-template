@@ -146,13 +146,13 @@ export function BuilderCanvas({
       // Calculate sticky positions based on measured heights
       let currentStickyOffset = newHeights.toolbar + newHeights.fillerTabBar
 
-      const urlBarSticky = fakeURLBarComponents.length > 0 && fakeURLBarComponents[0].props.isSticky === true
+      const urlBarSticky = fakeURLBarComponents.length > 0 && fakeURLBarComponents[0].props.urlBarSticky === true
       const urlBarTop = urlBarSticky ? `${currentStickyOffset}px` : undefined
       if (urlBarSticky && newHeights.urlBar > 0) {
         currentStickyOffset += newHeights.urlBar
       }
 
-      const headerBarSticky = websiteHeaderBarComponents.length > 0 && websiteHeaderBarComponents[0].props.isSticky === true
+      const headerBarSticky = websiteHeaderBarComponents.length > 0 && websiteHeaderBarComponents[0].props.headerBarSticky === true
       const headerBarTop = headerBarSticky ? `${currentStickyOffset}px` : undefined
       if (headerBarSticky && newHeights.headerBar > 0) {
         currentStickyOffset += newHeights.headerBar
@@ -189,9 +189,9 @@ export function BuilderCanvas({
       label: tab.label,
       enabled: tab.enabled,
       content: (
-        <div className="space-y-0">
+        <div className="flex flex-col items-center space-y-0">
           {tab.content.length === 0 ? (
-            <div className="text-center text-gray-400 py-12 border-2 border-dashed rounded-lg">
+            <div className="text-center text-gray-400 py-12 border-2 border-dashed rounded-lg w-full">
               <p>Drag components here or click to add</p>
             </div>
           ) : (
@@ -227,7 +227,7 @@ export function BuilderCanvas({
           
           {/* FakeURLBar components - rendered above tabs */}
           {fakeURLBarComponents.map((component) => {
-            const urlBarSticky = component.props.isSticky === true
+            const urlBarSticky = component.props.urlBarSticky === true
             return (
               <React.Fragment key={component.id}>
                 {renderComponent({
@@ -246,7 +246,7 @@ export function BuilderCanvas({
           
           {/* WebsiteHeaderBar components - rendered above tabs */}
           {websiteHeaderBarComponents.map((component) => {
-            const headerBarSticky = component.props.isSticky === true
+            const headerBarSticky = component.props.headerBarSticky === true
             return (
               <React.Fragment key={component.id}>
                 {renderComponent({

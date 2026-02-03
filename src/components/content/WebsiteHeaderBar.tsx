@@ -1,5 +1,5 @@
 import { cn } from '@/lib/utils'
-import { H3 } from './HeadingComponents'
+import { H1, H2, H3, H4, H5, H6 } from './HeadingComponents'
 import { IconImage } from './IconImage'
 
 interface WebsiteHeaderBarProps {
@@ -9,6 +9,8 @@ interface WebsiteHeaderBarProps {
   titleColor?: string
   iconUrl?: string
   iconAlt?: string
+  textAlign?: 'left' | 'center'
+  headingLevel?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6'
   className?: string
 }
 
@@ -19,25 +21,46 @@ export function WebsiteHeaderBar({
   titleColor,
   iconUrl,
   iconAlt,
+  textAlign = 'left',
+  headingLevel = 'h3',
   className,
 }: WebsiteHeaderBarProps) {
+  const hasIcon = !!iconUrl
+  const isCentered = textAlign === 'center'
+  
+  const HeadingComponent = {
+    h1: H1,
+    h2: H2,
+    h3: H3,
+    h4: H4,
+    h5: H5,
+    h6: H6,
+  }[headingLevel]
+  
   return (
     <div
-      className={cn('w-full flex items-center gap-4 px-3 py-2', className)}
+      className={cn(
+        'w-full flex items-center py-2',
+        isCentered && 'justify-center',
+        className
+      )}
       style={{
         backgroundColor: backgroundColor || 'transparent',
+        paddingLeft: '16px',
+        paddingRight: '16px',
+        gap: '16px',
       }}
     >
-      <IconImage iconUrl={iconUrl} iconAlt={iconAlt || 'Header icon'} />
-      <H3
-        className="mb-0"
+      {hasIcon && <IconImage iconUrl={iconUrl} iconAlt={iconAlt || 'Header icon'} />}
+      <HeadingComponent
+        className={cn('mb-0', isCentered ? 'text-center' : '')}
         style={{
           ...(fontFamily && { fontFamily }),
           ...(titleColor && { color: titleColor }),
         }}
       >
         {title}
-      </H3>
+      </HeadingComponent>
     </div>
   )
 }

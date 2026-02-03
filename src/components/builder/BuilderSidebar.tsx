@@ -1,7 +1,7 @@
 import React from 'react'
 import { ComponentType } from '@/types/website'
 import { ComponentPalette } from './ComponentPalette'
-import { TemplateSelector } from './TemplateSelector'
+import { SampleConfigSelector } from './SampleConfigSelector'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { cn } from '@/lib/utils'
@@ -158,7 +158,7 @@ export function BuilderSidebar({
             </div>
           </div>
 
-          <TemplateSelector
+          <SampleConfigSelector
             onLoadTemplate={onLoadTemplate}
             onResetToCustom={onResetToCustom}
             isTemplateMode={isTemplateMode}

@@ -62,7 +62,7 @@ function App() {
   }
 
   return (
-    <div className="h-screen flex flex-col overflow-hidden bg-gray-100" style={{ transform: 'scale(0.95)', transformOrigin: 'top center' }}>
+    <div className="h-screen flex flex-col overflow-hidden bg-gray-100">
       <div className="flex-1 flex overflow-hidden min-h-0">
         <BuilderSidebar
           onAddComponent={handleAddComponent}

@@ -247,6 +247,58 @@ export function ConfigurationPanel({
                 onChange={(e) => onUpdate({ logoAlt: e.target.value })}
               />
             </div>
+            <div>
+              <Label htmlFor="headingLevel">Heading Level</Label>
+              <select
+                id="headingLevel"
+                value={props.headingLevel || 'h1'}
+                onChange={(e) => onUpdate({ headingLevel: e.target.value as 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' })}
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+              >
+                <option value="h1">Heading 1</option>
+                <option value="h2">Heading 2</option>
+                <option value="h3">Heading 3</option>
+                <option value="h4">Heading 4</option>
+                <option value="h5">Heading 5</option>
+                <option value="h6">Heading 6</option>
+              </select>
+            </div>
+            <div>
+              <Label htmlFor="titleColor">Title Text Color</Label>
+              <div className="flex gap-2 items-center">
+                <input
+                  type="color"
+                  id="titleColorPicker"
+                  value={props.titleColor && /^#[0-9A-Fa-f]{6}$/.test(props.titleColor) 
+                    ? props.titleColor 
+                    : '#000000'}
+                  onChange={(e) => onUpdate({ titleColor: e.target.value })}
+                  className="h-10 w-16 cursor-pointer border border-gray-300 rounded"
+                />
+                <Input
+                  id="titleColor"
+                  value={props.titleColor || ''}
+                  onChange={(e) => onUpdate({ titleColor: e.target.value })}
+                  placeholder="#000000 or rgb(0, 0, 0)"
+                  className="flex-1"
+                />
+              </div>
+              <p className="text-xs text-gray-500 mt-1">
+                CSS color value (hex, rgb, or color name)
+              </p>
+            </div>
+            <div>
+              <Label htmlFor="titleFontFamily">Font Family</Label>
+              <Input
+                id="titleFontFamily"
+                value={props.titleFontFamily || ''}
+                onChange={(e) => onUpdate({ titleFontFamily: e.target.value })}
+                placeholder="Arial, sans-serif"
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                CSS font-family value (e.g., "Arial", "Times New Roman", "Georgia, serif")
+              </p>
+            </div>
           </>
         )}
 
@@ -333,7 +385,7 @@ export function ConfigurationPanel({
                 id="bannerSrc"
                 value={props.src || ''}
                 onChange={(e) => onUpdate({ src: e.target.value })}
-                placeholder="https://example.com/banner.jpg"
+                placeholder="https://example.com/banner.jpg or /assets/images/banner.jpg"
               />
             </div>
             <div>
@@ -343,6 +395,31 @@ export function ConfigurationPanel({
                 value={props.alt || ''}
                 onChange={(e) => onUpdate({ alt: e.target.value })}
               />
+            </div>
+            <div>
+              <Label htmlFor="bannerHeight">Height</Label>
+              <Input
+                id="bannerHeight"
+                type="text"
+                value={props.height !== undefined ? String(props.height) : ''}
+                onChange={(e) => {
+                  const value = e.target.value.trim()
+                  // Allow empty string, numbers, or CSS values like "300px", "50vh", "50%", etc.
+                  if (value === '') {
+                    onUpdate({ height: undefined })
+                  } else if (/^\d+$/.test(value)) {
+                    // Pure number - store as number for consistency with other components
+                    onUpdate({ height: parseInt(value, 10) })
+                  } else if (/^\d+(\.\d+)?(px|vh|vw|%|rem|em)$/i.test(value)) {
+                    // Valid CSS unit value - store as string
+                    onUpdate({ height: value })
+                  }
+                }}
+                placeholder="300px, 50vh, 400, etc."
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                Enter a number (pixels) or CSS value (e.g., 300px, 50vh, 400)
+              </p>
             </div>
           </>
         )}
@@ -402,8 +479,8 @@ export function ConfigurationPanel({
               <input
                 type="checkbox"
                 id="headerIsSticky"
-                checked={props.isSticky === true}
-                onChange={(e) => onUpdate({ isSticky: e.target.checked })}
+                checked={props.headerBarSticky === true}
+                onChange={(e) => onUpdate({ headerBarSticky: e.target.checked })}
                 className="w-4 h-4"
               />
               <Label htmlFor="headerIsSticky" className="cursor-pointer">
@@ -500,6 +577,37 @@ export function ConfigurationPanel({
                 placeholder="Header icon"
               />
             </div>
+            <div>
+              <Label htmlFor="headerTextAlign">Text Alignment</Label>
+              <select
+                id="headerTextAlign"
+                value={props.headerTextAlign || 'left'}
+                onChange={(e) => onUpdate({ headerTextAlign: e.target.value as 'left' | 'center' })}
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+              >
+                <option value="left">Left</option>
+                <option value="center">Center</option>
+              </select>
+              <p className="text-xs text-gray-500 mt-1">
+                If an icon is present, it stays left-aligned and text centers in remaining space
+              </p>
+            </div>
+            <div>
+              <Label htmlFor="headerHeadingLevel">Heading Level</Label>
+              <select
+                id="headerHeadingLevel"
+                value={props.headerHeadingLevel || 'h3'}
+                onChange={(e) => onUpdate({ headerHeadingLevel: e.target.value as 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' })}
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+              >
+                <option value="h1">Heading 1</option>
+                <option value="h2">Heading 2</option>
+                <option value="h3">Heading 3</option>
+                <option value="h4">Heading 4</option>
+                <option value="h5">Heading 5</option>
+                <option value="h6">Heading 6</option>
+              </select>
+            </div>
           </>
         )}
 
@@ -531,8 +639,8 @@ export function ConfigurationPanel({
               <input
                 type="checkbox"
                 id="urlBarIsSticky"
-                checked={props.isSticky === true}
-                onChange={(e) => onUpdate({ isSticky: e.target.checked })}
+                checked={props.urlBarSticky === true}
+                onChange={(e) => onUpdate({ urlBarSticky: e.target.checked })}
                 className="w-4 h-4"
               />
               <Label htmlFor="urlBarIsSticky" className="cursor-pointer">

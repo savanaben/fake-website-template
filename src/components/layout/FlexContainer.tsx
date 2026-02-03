@@ -25,7 +25,7 @@ export function FlexContainer({
   return (
     <div 
       className={cn(
-        'flex w-full min-h-[30px] p-4',
+        'flex w-full min-h-[30px] p-6',
         (!hasChildren || isEmpty) && 'border-2 border-dashed border-gray-300 rounded-lg',
         gap, 
         className

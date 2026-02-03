@@ -53,7 +53,7 @@ export function Column({
   return (
     <div 
       className={cn(
-        'min-h-[30px]',
+        'min-h-[30px] max-w-[900px]',
         hasPadding && 'p-6',
         widthClass,
         (!hasChildren || isEmpty) && 'border-2 border-dashed border-gray-300 rounded-lg',

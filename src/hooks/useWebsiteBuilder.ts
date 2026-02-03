@@ -1,53 +1,91 @@
 import { useState, useCallback } from 'react'
 import { WebsiteData, WebsiteComponent, ComponentType, ComponentProps, TabData, TabStyle } from '@/types/website'
+import sampleConfigsData from '@/config/sampleConfigs.json'
 
 function generateId(): string {
   return `comp-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
 }
 
-const initialWebsiteData: WebsiteData = {
-  tabs: [
-    {
-      id: 'tab-introduction',
-      label: 'Introduction',
-      content: [],
-      enabled: true,
-      position: 1,
-    },
-    {
-      id: 'tab-about',
-      label: 'About',
-      content: [],
-      enabled: true,
-      position: 2,
-    },
-    {
-      id: 'tab-history',
-      label: 'History',
-      content: [],
-      enabled: false,
-      position: 3,
-    },
-  ],
-  activeTabId: 'tab-introduction',
-  crossTabComponents: [
-    {
-      id: 'fake-url-bar-1',
-      type: 'fakeURLBar',
-      props: {
-        urlText: 'https://example.com',
-        visible: true,
-        enabled: true,
-      },
-    },
-  ],
+interface SampleConfig {
+  name: string
+  data: WebsiteData
 }
+
+interface SampleConfigsData {
+  configs: SampleConfig[]
+}
+
+// Get the "Full Features Usage" config as the default
+const sampleConfigs: SampleConfig[] = (sampleConfigsData as SampleConfigsData).configs
+const fullFeaturesConfig = sampleConfigs.find(config => config.name === 'Full Features Usage')
+
+// Normalize tabs for initial data
+const getInitialWebsiteData = (): WebsiteData => {
+  if (fullFeaturesConfig) {
+    const template = fullFeaturesConfig.data
+    const normalizedTabs = template.tabs.map((tab, index) => ({
+      ...tab,
+      position: tab.position || index + 1,
+    })).sort((a, b) => (a.position || 0) - (b.position || 0))
+      .map((tab, index) => ({
+        ...tab,
+        position: index + 1,
+      }))
+    
+    return {
+      ...template,
+      tabs: normalizedTabs,
+      crossTabComponents: template.crossTabComponents || [],
+    }
+  }
+  
+  // Fallback to default if config not found
+  return {
+    tabs: [
+      {
+        id: 'tab-introduction',
+        label: 'Introduction',
+        content: [],
+        enabled: true,
+        position: 1,
+      },
+      {
+        id: 'tab-about',
+        label: 'About',
+        content: [],
+        enabled: true,
+        position: 2,
+      },
+      {
+        id: 'tab-history',
+        label: 'History',
+        content: [],
+        enabled: false,
+        position: 3,
+      },
+    ],
+    activeTabId: 'tab-introduction',
+    crossTabComponents: [
+      {
+        id: 'fake-url-bar-1',
+        type: 'fakeURLBar',
+        props: {
+          urlText: 'https://example.com',
+          visible: true,
+          enabled: true,
+        },
+      },
+    ],
+  }
+}
+
+const initialWebsiteData: WebsiteData = getInitialWebsiteData()
 
 export function useWebsiteBuilder() {
   const [websiteData, setWebsiteData] = useState<WebsiteData>(initialWebsiteData)
   const [selectedComponentId, setSelectedComponentId] = useState<string | null>(null)
   const [showTabSettings, setShowTabSettings] = useState(false)
-  const [isTemplateMode, setIsTemplateMode] = useState(false)
+  const [isTemplateMode, setIsTemplateMode] = useState(true) // Start in template mode since we're loading a sample config
 
   const setActiveTab = useCallback((tabId: string) => {
     setWebsiteData((prev) => {
@@ -167,7 +205,7 @@ export function useWebsiteBuilder() {
     
     switch (type) {
       case 'title':
-        return { ...baseProps, title: 'Website Title', logoUrl: '', logoAlt: '' }
+        return { ...baseProps, title: 'Website Title', logoUrl: '', logoAlt: '', headingLevel: 'h1' }
       case 'paragraph':
         return { ...baseProps, content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.' }
       case 'h1':
@@ -564,9 +602,18 @@ export function useWebsiteBuilder() {
         position: index + 1, // Ensure positions are 1, 2, 3, etc.
       }))
     
+    // Ensure crossTabComponents is an array (even if empty)
+    const crossTabComponents = template.crossTabComponents || []
+    
     setWebsiteData({
       ...template,
       tabs: normalizedTabs,
+      crossTabComponents,
+      // Explicitly include all tab bar settings
+      tabStyle: template.tabStyle,
+      tabSticky: template.tabSticky,
+      tabIconUrl: template.tabIconUrl,
+      tabIconAlt: template.tabIconAlt,
     })
     setIsTemplateMode(true)
   }, [])

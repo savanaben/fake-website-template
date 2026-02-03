@@ -23,6 +23,9 @@ export interface ComponentProps {
   title?: string
   logoUrl?: string
   logoAlt?: string
+  headingLevel?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6'
+  titleColor?: string
+  titleFontFamily?: string
   
   // Paragraph props
   content?: string
@@ -45,7 +48,7 @@ export interface ComponentProps {
   // FakeURLBar props
   urlText?: string
   visible?: boolean
-  isSticky?: boolean // Whether the URL bar should be sticky
+  urlBarSticky?: boolean // Whether the URL bar should be sticky
   
   // WebsiteHeaderBar props
   headerTitle?: string
@@ -54,7 +57,9 @@ export interface ComponentProps {
   headerTitleColor?: string
   headerIconUrl?: string
   headerIconAlt?: string
-  isSticky?: boolean // Whether the header bar should be sticky
+  headerTextAlign?: 'left' | 'center' // Text alignment (default: 'left')
+  headerHeadingLevel?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' // Heading level (default: 'h3')
+  headerBarSticky?: boolean // Whether the header bar should be sticky
   
   // Layer props (available for all components)
   name?: string // Custom name for the layer

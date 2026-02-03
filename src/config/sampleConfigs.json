@@ -1,0 +1,312 @@
+{
+  "configs": [
+    {
+      "name": "Full Features Usage",
+      "data": {
+        "crossTabComponents": [
+          {
+            "id": "fake-url-bar-1",
+            "type": "fakeURLBar",
+            "props": {
+              "urlText": "nces.ed.gov/nationsreportcard/",
+              "visible": true,
+              "enabled": true
+            }
+          },
+          {
+            "id": "website-header-bar-1",
+            "type": "websiteHeaderBar",
+            "props": {
+              "headerTitle": "The National Assessment",
+              "headerTitleColor": "#171C66",
+              "headerBackgroundColor": "white",
+              "headingLevel": "h4",
+              "headerFontFamily": "Verdana",
+              "headerIconUrl": "/assets/images/naepp.svg",
+              "headerIconAlt": "NAEP icon",
+              "enabled": true
+            }
+          }
+        ],
+        "tabs": [
+          {
+            "id": "tab-introduction",
+            "label": "Introduction",
+            "enabled": true,
+            "position": 1,
+            "content": [
+              {
+                "id": "banner-image-1",
+                "type": "bannerImage",
+                "props": {
+                  "src": "/assets/images/naep_2024_science_math_reading_release_image.jpg",
+                  "alt": "Banner image",
+                  "enabled": true
+                }
+              },
+              {
+                "id": "flex-container-1",
+                "type": "flexContainer",
+                "props": {
+                  "gap": "gap-4",
+                  "columnDistribution": "5:3",
+                  "enabled": true
+                },
+                "children": [
+                  {
+                    "id": "column-1",
+                    "type": "column",
+                    "props": {
+                      "enabled": true,
+                      "columnHasPadding": false
+                    },
+                    "children": [
+                      {
+                        "id": "title-1",
+                        "type": "title",
+                        "props": {
+                          "title": "Measuring What Students Know and Can Do",
+                          "logoUrl": "",
+                          "headingLevel": "h3",
+                          "titleFontFamily": "Verdana",
+                          "titleColor": "#171C66",
+                          "logoAlt": "",
+                          "enabled": true
+                        }
+                      },
+                      {
+                        "id": "paragraph-1",
+                        "type": "paragraph",
+                        "props": {
+                          "content": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.",
+                          "enabled": true
+                        }
+                      },
+                      {
+                        "id": "paragraph-2",
+                        "type": "paragraph",
+                        "props": {
+                          "content": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.",
+                          "enabled": true
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "id": "column-2",
+                    "type": "column",
+                    "props": {
+                      "enabled": true,
+                      "columnHasPadding": false
+                    },
+                    "children": [
+                      {
+                        "id": "image-1",
+                        "type": "image",
+                        "props": {
+                          "src": "https://placehold.co/400x300",
+                          "alt": "Placeholder image",
+                          "enabled": true
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "tab-about",
+            "label": "About",
+            "enabled": true,
+            "position": 2,
+            "content": [
+              {
+                "id": "column-about",
+                "type": "column",
+                "props": {
+                  "enabled": true
+                },
+                "children": [
+                  {
+                    "id": "h2-about",
+                    "type": "h2",
+                    "props": {
+                      "text": "About",
+                      "enabled": true
+                    }
+                  },
+                  {
+                    "id": "paragraph-about",
+                    "type": "paragraph",
+                    "props": {
+                      "content": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.",
+                      "enabled": true
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "tab-methodology",
+            "label": "Methodology",
+            "enabled": false,
+            "position": 3,
+            "content": []
+          },
+          {
+            "id": "tab-assessments",
+            "label": "Assessments",
+            "enabled": false,
+            "position": 4,
+            "content": []
+          }
+        ],
+        "activeTabId": "tab-introduction",
+        "tabStyle": "line",
+        "tabSticky": false,
+        "tabIconUrl": null,
+        "tabIconAlt": null
+      }
+    },
+    {
+      "name": "Simpler tab Usage",
+      "data": {
+        "crossTabComponents": [
+          {
+            "id": "fake-url-bar-2",
+            "type": "fakeURLBar",
+            "props": {
+              "urlText": "NJcitizenscience.com",
+              "urlBarSticky": true,
+              "visible": true,
+              "enabled": true
+            }
+          }
+        ],
+        "tabs": [
+          {
+            "id": "tab-science-for-all",
+            "label": "Science for All",
+            "enabled": true,
+            "position": 1,
+            "content": [
+              {
+                "id": "column-content",
+                "type": "column",
+                "props": {
+                  "enabled": true
+                },
+                "children": [
+                  {
+                    "id": "title-science",
+                    "type": "title",
+                    "props": {
+                      "title": "Everyone Can Do Science",
+                      "titleColor": "#008a10",
+                      "headingLevel": "h2",
+                      "logoUrl": "",
+                      "logoAlt": "",
+                      "enabled": true
+                    }
+                  },
+                  {
+                    "id": "paragraph-science-1",
+                    "type": "paragraph",
+                    "props": {
+                      "content": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.",
+                      "enabled": true
+                    }
+                  },
+                  {
+                    "id": "paragraph-science-2",
+                    "type": "paragraph",
+                    "props": {
+                      "content": "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
+                      "enabled": true
+                    }
+                  },
+                  {
+                    "id": "image-science",
+                    "type": "image",
+                    "props": {
+                      "src": "https://placehold.co/1200x400",
+                      "alt": "Placeholder image",
+                      "enabled": true
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "tab-get-involved",
+            "label": "Get Involved",
+            "enabled": true,
+            "position": 2,
+            "content": [
+              {
+                "id": "website-header-bar-get-involved",
+                "type": "websiteHeaderBar",
+                "props": {
+                  "headerTitle": "Get Involved in Your Community",
+                  "headerTitleColor": "#ffffff",
+                  "headerBackgroundColor": "#338000",
+                  "headerTextAlign": "center",
+                  "headerIconUrl": "",
+                  "headerIconAlt": "",
+                  "enabled": true
+                }
+              },
+              {
+                "id": "column-get-involved",
+                "type": "column",
+                "props": {
+                  "enabled": true
+                },
+                "children": [
+                  {
+                    "id": "paragraph-get-involved",
+                    "type": "paragraph",
+                    "props": {
+                      "content": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.",
+                      "enabled": true
+                    }
+                  },
+                  {
+                    "id": "paragraph-get-involved-2",
+                    "type": "paragraph",
+                    "props": {
+                      "content": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.",
+                      "enabled": true
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "tab-impact",
+            "label": "Impact",
+            "enabled": false,
+            "position": 3,
+            "content": []
+          },
+          {
+            "id": "tab-contact",
+            "label": "Contact",
+            "enabled": false,
+            "position": 4,
+            "content": []
+          }
+        ],
+        "activeTabId": "tab-science-for-all",
+        "tabStyle": "line",
+        "tabSticky": true,
+        "tabIconUrl": "/assets/images/people.png",
+        "tabIconAlt": "Tab icon"
+      }
+    }
+  ]
+}
