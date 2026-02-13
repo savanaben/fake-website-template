@@ -1,8 +1,68 @@
+import React from 'react'
 import { ComponentType, ComponentProps, TabStyle } from '@/types/website'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Button } from '@/components/ui/button'
+import { NAEP_LIGHT_BACKGROUNDS, NAEP_BORDER_COLORS } from '@/lib/naepTokens'
+
+const CARD_WIDTH_OPTIONS = ['max-w-xs', 'max-w-sm', 'max-w-md', 'max-w-lg', 'max-w-xl', 'max-w-2xl', 'max-w-3xl', 'max-w-4xl', 'max-w-5xl', 'max-w-6xl', 'max-w-7xl', 'max-w-full'] as const
+
+const CARD_PADDING_OPTIONS = ['space-16', 'space-24', 'space-32', 'space-48'] as const
+
+const DEFAULT_CARD_BORDER_COLOR = '#909090'
+
+const OVER_BACKGROUND_PRESET: Partial<ComponentProps> = {
+  cardRounding: 'large',
+  cardShadow: 'high',
+  cardBackgroundColor: '#ffffff',
+  cardBorderColor: DEFAULT_CARD_BORDER_COLOR,
+  cardBorder: 'thin',
+  cardWidth: 'default',
+  cardPadding: 'space-32',
+}
+const INLINE_PRESET: Partial<ComponentProps> = {
+  cardRounding: 'medium',
+  cardShadow: 'none',
+  cardBackgroundColor: '#ffffff',
+  cardBorderColor: DEFAULT_CARD_BORDER_COLOR,
+  cardBorder: 'thick',
+  cardWidth: 'default',
+  cardPadding: 'space-24',
+}
+
+function normalizeCardBorder(b: ComponentProps['cardBorder']): 'none' | 'thin' | 'thick' {
+  return b === 'bordered' ? 'thick' : (b ?? 'none')
+}
+
+function cardPropsMatchPreset(props: ComponentProps, preset: Partial<ComponentProps>): boolean {
+  return (
+    (props.cardRounding ?? 'medium') === (preset.cardRounding ?? 'medium') &&
+    (props.cardShadow ?? 'none') === (preset.cardShadow ?? 'none') &&
+    (props.cardBackgroundColor ?? '#ffffff') === (preset.cardBackgroundColor ?? '#ffffff') &&
+    (props.cardBorderColor ?? DEFAULT_CARD_BORDER_COLOR) === (preset.cardBorderColor ?? DEFAULT_CARD_BORDER_COLOR) &&
+    normalizeCardBorder(props.cardBorder) === normalizeCardBorder(preset.cardBorder) &&
+    (props.cardWidth ?? 'default') === (preset.cardWidth ?? 'default') &&
+    (props.cardPadding ?? 'space-24') === (preset.cardPadding ?? 'space-24')
+  )
+}
+
+function effectiveCardType(props: ComponentProps): 'overBackground' | 'inline' | 'custom' {
+  if (props.cardType === 'custom') return 'custom'
+  if (props.cardType === 'overBackground' && cardPropsMatchPreset(props, OVER_BACKGROUND_PRESET)) return 'overBackground'
+  if (props.cardType === 'inline' && cardPropsMatchPreset(props, INLINE_PRESET)) return 'inline'
+  if (cardPropsMatchPreset(props, OVER_BACKGROUND_PRESET)) return 'overBackground'
+  if (cardPropsMatchPreset(props, INLINE_PRESET)) return 'inline'
+  return 'custom'
+}
+
+function cardUpdateWithAutoCustom(props: ComponentProps, updates: Partial<ComponentProps>): Partial<ComponentProps> {
+  const next = { ...props, ...updates }
+  const noLongerOverBg = !cardPropsMatchPreset(next, OVER_BACKGROUND_PRESET)
+  const noLongerInline = !cardPropsMatchPreset(next, INLINE_PRESET)
+  if (noLongerOverBg && noLongerInline) return { ...updates, cardType: 'custom' }
+  return updates
+}
 
 interface TabData {
   id: string
@@ -428,6 +488,56 @@ export function ConfigurationPanel({
         {componentType === 'flexContainer' && (
           <>
             <div>
+              <Label>Width</Label>
+              <div className="flex gap-2 mt-1">
+                {[
+                  { value: 'default' as const, label: 'Default (900px max)' },
+                  { value: 'full' as const, label: 'Full width (100%)' },
+                ].map(({ value, label }) => (
+                  <button
+                    key={value}
+                    type="button"
+                    onClick={() => onUpdate({ flexContainerMaxWidth: value })}
+                    className={`px-3 py-1.5 rounded text-sm ${
+                      (props.flexContainerMaxWidth || 'default') === value
+                        ? 'bg-blue-600 text-white'
+                        : 'bg-gray-200 hover:bg-gray-300'
+                    }`}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+              <p className="text-xs text-gray-500 mt-1">
+                Default constrains to 900px; full width fills the available area.
+              </p>
+            </div>
+            <div>
+              <Label>Column layout</Label>
+              <div className="flex gap-2 mt-1">
+                {[
+                  { value: 'row' as const, label: 'Side by side' },
+                  { value: 'column' as const, label: 'Stacked' },
+                ].map(({ value, label }) => (
+                  <button
+                    key={value}
+                    type="button"
+                    onClick={() => onUpdate({ flexDirection: value })}
+                    className={`px-3 py-1.5 rounded text-sm ${
+                      (props.flexDirection || 'row') === value
+                        ? 'bg-blue-600 text-white'
+                        : 'bg-gray-200 hover:bg-gray-300'
+                    }`}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+              <p className="text-xs text-gray-500 mt-1">
+                Side by side: columns in a row. Stacked: columns in a column.
+              </p>
+            </div>
+            <div>
               <Label htmlFor="gap">Gap</Label>
               <Input
                 id="gap"
@@ -451,11 +561,285 @@ export function ConfigurationPanel({
           </>
         )}
 
+        {/* Card Component */}
+        {componentType === 'card' && (
+          <>
+            <div>
+              <Label>Type</Label>
+              <div
+                role="group"
+                aria-label="Card type"
+                className="flex flex-col rounded-md border border-gray-300 overflow-hidden mt-1"
+              >
+                {[
+                  { value: 'overBackground' as const, label: 'Over Background' },
+                  { value: 'inline' as const, label: 'Inline' },
+                  { value: 'custom' as const, label: 'Custom' },
+                ].map(({ value, label }) => {
+                  const effective = effectiveCardType(props)
+                  const isSelected = effective === value
+                  return (
+                    <button
+                      key={value}
+                      type="button"
+                      onClick={() => {
+                        if (value === 'overBackground') {
+                          onUpdate({
+                            cardType: 'overBackground',
+                            ...OVER_BACKGROUND_PRESET,
+                          })
+                        } else if (value === 'inline') {
+                          onUpdate({
+                            cardType: 'inline',
+                            ...INLINE_PRESET,
+                          })
+                        } else {
+                          onUpdate({ cardType: 'custom' })
+                        }
+                      }}
+                      className={`px-3 py-2 text-sm w-full border-b border-gray-300 last:border-b-0 transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-inset -mt-px first:mt-0 ${
+                        isSelected ? 'bg-blue-600 text-white' : 'bg-white hover:bg-gray-50'
+                      }`}
+                    >
+                      {label}
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+            <div>
+              <Label>Rounding</Label>
+              <div className="flex rounded-md border border-gray-300 overflow-hidden mt-1">
+                {(['small', 'medium', 'large'] as const).map((opt) => (
+                  <button
+                    key={opt}
+                    type="button"
+                    onClick={() => onUpdate(cardUpdateWithAutoCustom(props, { cardRounding: opt }))}
+                    className={`flex-1 min-w-0 px-3 py-1.5 text-sm border-r border-gray-300 last:border-r-0 transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-inset ${
+                      (props.cardRounding || 'medium') === opt
+                        ? 'bg-blue-600 text-white'
+                        : 'bg-white hover:bg-gray-50'
+                    }`}
+                  >
+                    {opt.charAt(0).toUpperCase() + opt.slice(1)}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div>
+              <Label>Shadow</Label>
+              <div className="flex rounded-md border border-gray-300 overflow-hidden mt-1">
+                {(['none', 'low', 'high'] as const).map((opt) => (
+                  <button
+                    key={opt}
+                    type="button"
+                    onClick={() => onUpdate(cardUpdateWithAutoCustom(props, { cardShadow: opt }))}
+                    className={`flex-1 min-w-0 px-3 py-1.5 text-sm border-r border-gray-300 last:border-r-0 transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-inset ${
+                      (props.cardShadow || 'none') === opt
+                        ? 'bg-blue-600 text-white'
+                        : 'bg-white hover:bg-gray-50'
+                    }`}
+                  >
+                    {opt.charAt(0).toUpperCase() + opt.slice(1)}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div>
+              <Label>Background Color</Label>
+              <div className="mt-2 space-y-2">
+                <p className="text-xs font-medium text-gray-600">Core Colors</p>
+                <div className="flex flex-wrap gap-2">
+                  {[
+                    { label: 'White', value: '#ffffff', borderColor: DEFAULT_CARD_BORDER_COLOR },
+                    { label: 'Blue', value: '#e0f2f1', borderColor: '#80CBC4' },
+                    { label: 'Yellow', value: '#ffecb3', borderColor: '#FFB300' },
+                    { label: 'Transparent', value: 'transparent', borderColor: DEFAULT_CARD_BORDER_COLOR },
+                  ].map(({ label, value, borderColor }) => {
+                    const isSelected = (props.cardBackgroundColor || '#ffffff') === value
+                    return (
+                      <button
+                        key={value}
+                        type="button"
+                        title={label}
+                        onClick={() => onUpdate(cardUpdateWithAutoCustom(props, { cardBackgroundColor: value, cardBorderColor: borderColor }))}
+                        className={`w-6 h-6 rounded border-2 ${
+                          isSelected
+                            ? 'ring-2'
+                            : 'border-gray-300 hover:border-gray-500'
+                        }`}
+                        style={{
+                          backgroundColor: value === 'transparent' ? 'transparent' : value,
+                          backgroundImage: value === 'transparent' ? 'linear-gradient(45deg, #ccc 25%, transparent 25%), linear-gradient(-45deg, #ccc 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #ccc 75%), linear-gradient(-45deg, transparent 75%, #ccc 75%)' : undefined,
+                          backgroundSize: value === 'transparent' ? '4px 4px' : undefined,
+                          backgroundPosition: value === 'transparent' ? '0 0, 0 2px, 2px -2px, -2px 0' : undefined,
+                          ...(isSelected ? { borderColor, boxShadow: `0 0 0 2px ${borderColor}` } : {}),
+                        }}
+                      />
+                    )
+                  })}
+                </div>
+                <p className="text-xs font-medium text-gray-600 mt-2">Custom (NAEP light)</p>
+                <div className="flex flex-wrap gap-2">
+                  {Object.entries(NAEP_LIGHT_BACKGROUNDS).map(([name, hex]) => {
+                    const customBorderColor = NAEP_BORDER_COLORS[name] ?? DEFAULT_CARD_BORDER_COLOR
+                    const isSelected = (props.cardBackgroundColor || '#ffffff') === hex
+                    return (
+                      <button
+                        key={name}
+                        type="button"
+                        title={name}
+                        onClick={() => onUpdate(cardUpdateWithAutoCustom(props, { cardBackgroundColor: hex, cardBorderColor: customBorderColor }))}
+                        className={`w-6 h-6 rounded border-2 ${
+                          isSelected ? 'ring-2' : 'border-gray-300 hover:border-gray-500'
+                        }`}
+                        style={{
+                          backgroundColor: hex,
+                          ...(isSelected ? { borderColor: customBorderColor, boxShadow: `0 0 0 2px ${customBorderColor}` } : {}),
+                        }}
+                      />
+                    )
+                  })}
+                </div>
+              </div>
+            </div>
+            <div>
+              <Label>Border</Label>
+              <div className="flex rounded-md border border-gray-300 overflow-hidden mt-1">
+                {[
+                  { value: 'none' as const, label: 'None' },
+                  { value: 'thin' as const, label: 'Thin' },
+                  { value: 'thick' as const, label: 'Thick' },
+                ].map(({ value, label }) => {
+                  const effectiveBorder = normalizeCardBorder(props.cardBorder)
+                  return (
+                    <button
+                      key={value}
+                      type="button"
+                      onClick={() => onUpdate(cardUpdateWithAutoCustom(props, { cardBorder: value }))}
+                      className={`flex-1 min-w-0 px-3 py-1.5 text-sm border-r border-gray-300 last:border-r-0 transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-inset ${
+                        effectiveBorder === value
+                          ? 'bg-blue-600 text-white'
+                          : 'bg-white hover:bg-gray-50'
+                      }`}
+                    >
+                      {label}
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+            <div>
+              <Label>Width</Label>
+              <div className="flex rounded-md border border-gray-300 overflow-hidden mt-1">
+                {(['default', 'manual'] as const).map((opt) => (
+                  <button
+                    key={opt}
+                    type="button"
+                    onClick={() => {
+                      const updates: Partial<ComponentProps> = { cardWidth: opt }
+                      if (opt === 'manual' && !CARD_WIDTH_OPTIONS.includes((props.cardWidthManual || '') as (typeof CARD_WIDTH_OPTIONS)[number])) {
+                        updates.cardWidthManual = 'max-w-md'
+                      }
+                      onUpdate(cardUpdateWithAutoCustom(props, updates))
+                    }}
+                    className={`flex-1 min-w-0 px-3 py-1.5 text-sm border-r border-gray-300 last:border-r-0 transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-inset ${
+                      (props.cardWidth || 'default') === opt
+                        ? 'bg-blue-600 text-white'
+                        : 'bg-white hover:bg-gray-50'
+                    }`}
+                  >
+                    {opt.charAt(0).toUpperCase() + opt.slice(1)}
+                  </button>
+                ))}
+              </div>
+              {(props.cardWidth || 'default') === 'manual' && (
+                <div className="mt-2">
+                  <Label htmlFor="cardWidthSlider">Max Width</Label>
+                  <input
+                    id="cardWidthSlider"
+                    type="range"
+                    min={0}
+                    max={CARD_WIDTH_OPTIONS.length - 1}
+                    value={(() => {
+                      const key = props.cardWidthManual || 'max-w-md'
+                      const idx = CARD_WIDTH_OPTIONS.indexOf(key as (typeof CARD_WIDTH_OPTIONS)[number])
+                      return idx >= 0 ? idx : 3
+                    })()}
+                    onChange={(e) => {
+                      const idx = parseInt(e.target.value, 10)
+                      if (!isNaN(idx) && idx >= 0 && idx < CARD_WIDTH_OPTIONS.length) {
+                        onUpdate(cardUpdateWithAutoCustom(props, { cardWidthManual: CARD_WIDTH_OPTIONS[idx] }))
+                      }
+                    }}
+                    className="w-full h-2 rounded-lg appearance-none cursor-pointer accent-blue-600 mt-1"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    {props.cardWidthManual && CARD_WIDTH_OPTIONS.includes(props.cardWidthManual as (typeof CARD_WIDTH_OPTIONS)[number])
+                      ? props.cardWidthManual
+                      : CARD_WIDTH_OPTIONS[3]}
+                  </p>
+                </div>
+              )}
+            </div>
+            <div>
+              <Label>Padding (NAEP spacing)</Label>
+              <input
+                type="range"
+                min={0}
+                max={3}
+                value={(() => {
+                  const key = props.cardPadding || 'space-24'
+                  const idx = CARD_PADDING_OPTIONS.indexOf(key as (typeof CARD_PADDING_OPTIONS)[number])
+                  return idx >= 0 ? idx : 1
+                })()}
+                onChange={(e) => {
+                  const idx = parseInt(e.target.value, 10)
+                  if (!isNaN(idx) && idx >= 0 && idx <= 3) {
+                    onUpdate(cardUpdateWithAutoCustom(props, { cardPadding: CARD_PADDING_OPTIONS[idx] }))
+                  }
+                }}
+                className="w-full h-2 rounded-lg appearance-none cursor-pointer accent-blue-600 mt-1"
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                {props.cardPadding && ['space-16', 'space-24', 'space-32', 'space-48'].includes(props.cardPadding)
+                  ? `${props.cardPadding} (${props.cardPadding.replace('space-', '')}px)`
+                  : 'space-24 (24px)'}
+              </p>
+            </div>
+          </>
+        )}
+
         {/* Column Component */}
         {componentType === 'column' && (
           <>
             <div className="text-sm text-gray-500 mb-4">
               Column width is controlled by the parent Flex Container's distribution setting.
+            </div>
+            <div>
+              <Label>Width</Label>
+              <div className="flex gap-2 mt-1">
+                {[
+                  { value: 'default' as const, label: 'Default (900px max)' },
+                  { value: 'full' as const, label: 'Full width' },
+                ].map(({ value, label }) => (
+                  <button
+                    key={value}
+                    type="button"
+                    onClick={() => onUpdate({ columnMaxWidth: value })}
+                    className={`px-3 py-1.5 rounded text-sm ${
+                      (props.columnMaxWidth || 'default') === value
+                        ? 'bg-blue-600 text-white'
+                        : 'bg-gray-200 hover:bg-gray-300'
+                    }`}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+              <p className="text-xs text-gray-500 mt-1">
+                Default constrains to 900px; full width fills the available area.
+              </p>
             </div>
             <div className="flex items-center gap-2">
               <input
@@ -608,6 +992,322 @@ export function ConfigurationPanel({
                 <option value="h6">Heading 6</option>
               </select>
             </div>
+          </>
+        )}
+
+        {/* SidebarPage Component */}
+        {componentType === 'sidebarPage' && (
+          <div className="text-sm text-gray-500">
+            Add SidebarColumn and FlexContainer children to build your sidebar layout.
+            Author children in any order (e.g., SidebarColumn, FlexContainer, SidebarColumn).
+          </div>
+        )}
+
+        {/* SidebarColumn Component */}
+        {componentType === 'sidebarColumn' && (
+          <>
+            <div>
+              <Label htmlFor="sidebarColumnWidth">Width</Label>
+              <Input
+                id="sidebarColumnWidth"
+                value={props.sidebarColumnWidth || '200px'}
+                onChange={(e) => onUpdate({ sidebarColumnWidth: e.target.value })}
+                placeholder="200px"
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                Fixed width (e.g., "200px", "300px", "25%")
+              </p>
+            </div>
+            <div>
+              <Label htmlFor="sidebarColumnBgColor">Background Color</Label>
+              <div className="flex gap-2 items-center">
+                <input
+                  type="color"
+                  id="sidebarColumnBgColorPicker"
+                  value={props.sidebarColumnBgColor && /^#[0-9A-Fa-f]{6}$/.test(props.sidebarColumnBgColor)
+                    ? props.sidebarColumnBgColor
+                    : '#ffffff'}
+                  onChange={(e) => onUpdate({ sidebarColumnBgColor: e.target.value })}
+                  className="h-10 w-16 cursor-pointer border border-gray-300 rounded"
+                />
+                <Input
+                  id="sidebarColumnBgColor"
+                  value={props.sidebarColumnBgColor || ''}
+                  onChange={(e) => onUpdate({ sidebarColumnBgColor: e.target.value })}
+                  placeholder="#f0f0f0 or transparent"
+                  className="flex-1"
+                />
+              </div>
+            </div>
+            <div>
+              <Label htmlFor="sidebarColumnBgImage">Background Image URL</Label>
+              <Input
+                id="sidebarColumnBgImage"
+                value={props.sidebarColumnBgImage || ''}
+                onChange={(e) => onUpdate({ sidebarColumnBgImage: e.target.value || undefined })}
+                placeholder="https://example.com/image.jpg"
+              />
+            </div>
+            {props.sidebarColumnBgImage && (
+              <>
+                <div>
+                  <Label htmlFor="sidebarColumnBgImageRepeat">Background Repeat</Label>
+                  <select
+                    id="sidebarColumnBgImageRepeat"
+                    value={props.sidebarColumnBgImageRepeat || 'no-repeat'}
+                    onChange={(e) => onUpdate({ sidebarColumnBgImageRepeat: e.target.value as ComponentProps['sidebarColumnBgImageRepeat'] })}
+                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                  >
+                    <option value="no-repeat">No Repeat</option>
+                    <option value="repeat">Repeat</option>
+                    <option value="repeat-x">Repeat X</option>
+                    <option value="repeat-y">Repeat Y</option>
+                  </select>
+                </div>
+                <div>
+                  <Label htmlFor="sidebarColumnBgImageSize">Background Size</Label>
+                  <select
+                    id="sidebarColumnBgImageSize"
+                    value={props.sidebarColumnBgImageSize || 'cover'}
+                    onChange={(e) => onUpdate({ sidebarColumnBgImageSize: e.target.value as ComponentProps['sidebarColumnBgImageSize'] })}
+                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                  >
+                    <option value="cover">Cover (fill proportionally)</option>
+                    <option value="contain">Contain (fit within)</option>
+                    <option value="auto">Auto (natural size)</option>
+                    <option value="stretch">Stretch (scales to full column height)</option>
+                  </select>
+                  <p className="text-xs text-gray-500 mt-1">
+                    "Stretch" scales the image to the full column height, so it scrolls with the page on long passages.
+                  </p>
+                </div>
+                <div>
+                  <Label>Background Position</Label>
+                  <div className="grid grid-cols-3 gap-1 mt-1 w-fit">
+                    {([
+                      ['top-left', 'top', 'top-right'],
+                      ['left', 'center', 'right'],
+                      ['bottom-left', 'bottom', 'bottom-right'],
+                    ] as const).map((row, ri) => (
+                      <React.Fragment key={ri}>
+                        {row.map((pos) => (
+                          <button
+                            key={pos}
+                            type="button"
+                            onClick={() => onUpdate({ sidebarColumnBgImagePosition: pos })}
+                            className={`w-8 h-8 rounded text-[10px] leading-tight border ${
+                              (props.sidebarColumnBgImagePosition || 'center') === pos
+                                ? 'bg-blue-600 text-white border-blue-600'
+                                : 'bg-white hover:bg-gray-100 border-gray-300'
+                            }`}
+                            title={pos}
+                          >
+                            {pos === 'center' ? '\u2022' : pos === 'top' ? '\u2191' : pos === 'bottom' ? '\u2193' : pos === 'left' ? '\u2190' : pos === 'right' ? '\u2192' : pos === 'top-left' ? '\u2196' : pos === 'top-right' ? '\u2197' : pos === 'bottom-left' ? '\u2199' : '\u2198'}
+                          </button>
+                        ))}
+                      </React.Fragment>
+                    ))}
+                  </div>
+                </div>
+              </>
+            )}
+          </>
+        )}
+
+        {/* SidebarContent Component */}
+        {componentType === 'sidebarContent' && (
+          <>
+            <div>
+              <Label htmlFor="sidebarContentBgColor">Background Color</Label>
+              <div className="flex gap-2 items-center">
+                <input
+                  type="color"
+                  id="sidebarContentBgColorPicker"
+                  value={props.sidebarContentBgColor && /^#[0-9A-Fa-f]{6}$/.test(props.sidebarContentBgColor)
+                    ? props.sidebarContentBgColor
+                    : '#ffffff'}
+                  onChange={(e) => onUpdate({ sidebarContentBgColor: e.target.value })}
+                  className="h-10 w-16 cursor-pointer border border-gray-300 rounded"
+                />
+                <Input
+                  id="sidebarContentBgColor"
+                  value={props.sidebarContentBgColor || ''}
+                  onChange={(e) => onUpdate({ sidebarContentBgColor: e.target.value })}
+                  placeholder="#f0f0f0 or transparent"
+                  className="flex-1"
+                />
+              </div>
+            </div>
+            <div>
+              <Label>Vertical Alignment in Parent</Label>
+              <div className="flex rounded-md border border-gray-300 overflow-hidden mt-1">
+                {([
+                  { value: 'start' as const, label: 'Top' },
+                  { value: 'center' as const, label: 'Center' },
+                  { value: 'end' as const, label: 'Bottom' },
+                ]).map(({ value, label }) => (
+                  <button
+                    key={value}
+                    type="button"
+                    onClick={() => onUpdate({ sidebarContentVerticalAlign: value })}
+                    className={`flex-1 min-w-0 px-3 py-1.5 text-sm border-r border-gray-300 last:border-r-0 transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-inset ${
+                      (props.sidebarContentVerticalAlign || 'start') === value
+                        ? 'bg-blue-600 text-white'
+                        : 'bg-white hover:bg-gray-50'
+                    }`}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+              <p className="text-xs text-gray-500 mt-1">
+                Positions this container within the parent SidebarColumn.
+              </p>
+            </div>
+            <div>
+              <Label htmlFor="sidebarContentImage">Image URL</Label>
+              <Input
+                id="sidebarContentImage"
+                value={props.sidebarContentImage || ''}
+                onChange={(e) => onUpdate({ sidebarContentImage: e.target.value || undefined })}
+                placeholder="https://example.com/image.jpg"
+              />
+            </div>
+            {props.sidebarContentImage && (
+              <>
+                <div>
+                  <Label htmlFor="sidebarContentImageRepeat">Image Repeat</Label>
+                  <select
+                    id="sidebarContentImageRepeat"
+                    value={props.sidebarContentImageRepeat || 'no-repeat'}
+                    onChange={(e) => onUpdate({ sidebarContentImageRepeat: e.target.value as ComponentProps['sidebarContentImageRepeat'] })}
+                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                  >
+                    <option value="no-repeat">No Repeat</option>
+                    <option value="repeat">Repeat</option>
+                    <option value="repeat-x">Repeat X</option>
+                    <option value="repeat-y">Repeat Y</option>
+                  </select>
+                </div>
+                <div>
+                  <Label htmlFor="sidebarContentImageSize">Image Size</Label>
+                  <select
+                    id="sidebarContentImageSize"
+                    value={props.sidebarContentImageSize || 'cover'}
+                    onChange={(e) => onUpdate({ sidebarContentImageSize: e.target.value as ComponentProps['sidebarContentImageSize'] })}
+                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                  >
+                    <option value="cover">Cover (fill proportionally)</option>
+                    <option value="contain">Contain (fit within)</option>
+                    <option value="auto">Auto (natural size)</option>
+                    <option value="stretch">Stretch (scales to container)</option>
+                  </select>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Cover/contain preserve aspect ratio; stretch fills the container.
+                  </p>
+                </div>
+                <div>
+                  <Label>Image Position</Label>
+                  <div className="grid grid-cols-3 gap-1 mt-1 w-fit">
+                    {([
+                      ['top-left', 'top', 'top-right'],
+                      ['left', 'center', 'right'],
+                      ['bottom-left', 'bottom', 'bottom-right'],
+                    ] as const).map((row, ri) => (
+                      <React.Fragment key={ri}>
+                        {row.map((pos) => (
+                          <button
+                            key={pos}
+                            type="button"
+                            onClick={() => onUpdate({ sidebarContentImagePosition: pos })}
+                            className={`w-8 h-8 rounded text-[10px] leading-tight border ${
+                              (props.sidebarContentImagePosition || 'center') === pos
+                                ? 'bg-blue-600 text-white border-blue-600'
+                                : 'bg-white hover:bg-gray-100 border-gray-300'
+                            }`}
+                            title={pos}
+                          >
+                            {pos === 'center' ? '\u2022' : pos === 'top' ? '\u2191' : pos === 'bottom' ? '\u2193' : pos === 'left' ? '\u2190' : pos === 'right' ? '\u2192' : pos === 'top-left' ? '\u2196' : pos === 'top-right' ? '\u2197' : pos === 'bottom-left' ? '\u2199' : '\u2198'}
+                          </button>
+                        ))}
+                      </React.Fragment>
+                    ))}
+                  </div>
+                </div>
+              </>
+            )}
+            <div>
+              <Label>Height</Label>
+              <div className="flex rounded-md border border-gray-300 overflow-hidden mt-1">
+                {([
+                  { value: 'grow', label: 'Grow / Fill' },
+                  { value: 'fixed', label: 'Fixed' },
+                ]).map(({ value, label }) => {
+                  const isGrow = (props.sidebarContentHeight || 'grow') === 'grow'
+                  const isSelected = value === 'grow' ? isGrow : !isGrow
+                  return (
+                    <button
+                      key={value}
+                      type="button"
+                      onClick={() => onUpdate({ sidebarContentHeight: value === 'grow' ? 'grow' : '200px' })}
+                      className={`flex-1 min-w-0 px-3 py-1.5 text-sm border-r border-gray-300 last:border-r-0 transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-inset ${
+                        isSelected ? 'bg-blue-600 text-white' : 'bg-white hover:bg-gray-50'
+                      }`}
+                    >
+                      {label}
+                    </button>
+                  )
+                })}
+              </div>
+              {(props.sidebarContentHeight || 'grow') !== 'grow' && (
+                <div className="mt-2">
+                  <Input
+                    value={props.sidebarContentHeight || '200px'}
+                    onChange={(e) => onUpdate({ sidebarContentHeight: e.target.value })}
+                    placeholder="200px"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    Fixed height value (e.g., "200px", "50%")
+                  </p>
+                </div>
+              )}
+            </div>
+            <div className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                id="sidebarContentSticky"
+                checked={props.sidebarContentSticky === true}
+                onChange={(e) => onUpdate({ sidebarContentSticky: e.target.checked })}
+                className="w-4 h-4"
+              />
+              <Label htmlFor="sidebarContentSticky" className="cursor-pointer">
+                Sticky
+              </Label>
+            </div>
+            {props.sidebarContentSticky && (
+              <div>
+                <Label>Stick To</Label>
+                <div className="flex rounded-md border border-gray-300 overflow-hidden mt-1">
+                  {([
+                    { value: 'top' as const, label: 'Top' },
+                    { value: 'bottom' as const, label: 'Bottom' },
+                  ]).map(({ value, label }) => (
+                    <button
+                      key={value}
+                      type="button"
+                      onClick={() => onUpdate({ sidebarContentStickyEdge: value })}
+                      className={`flex-1 min-w-0 px-3 py-1.5 text-sm border-r border-gray-300 last:border-r-0 transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-inset ${
+                        (props.sidebarContentStickyEdge || 'top') === value
+                          ? 'bg-blue-600 text-white'
+                          : 'bg-white hover:bg-gray-50'
+                      }`}
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
           </>
         )}
 

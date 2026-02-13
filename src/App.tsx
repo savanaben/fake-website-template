@@ -100,6 +100,8 @@ function App() {
           tabSticky={websiteData.tabSticky || false}
           tabIconUrl={websiteData.tabIconUrl}
           tabIconAlt={websiteData.tabIconAlt}
+          hideTabBar={websiteData.hideTabBar}
+          hideToolbar={websiteData.hideToolbar}
         />
         <LayerManager
           components={activeTab?.content || []}

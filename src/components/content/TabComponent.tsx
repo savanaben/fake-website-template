@@ -60,6 +60,7 @@ export function TabComponent({ tabs, activeTabId, onTabChange, className, style 
                     'text-base transition-colors flex items-center relative z-10',
                     'rounded-t-lg',
                     !isEnabled && 'cursor-not-allowed',
+                    isActive && isEnabled && 'cursor-default',
                     isActive && isEnabled
                       ? 'bg-white'
                       : 'bg-[rgb(245,245,245)]'
@@ -133,6 +134,7 @@ export function TabComponent({ tabs, activeTabId, onTabChange, className, style 
                   'text-base transition-colors flex items-center',
                   'border-b-2',
                   !isEnabled && 'cursor-not-allowed',
+                  isActive && isEnabled && 'cursor-default',
                   isEnabled && 'font-bold',
                   isActive && isEnabled && 'border-b-4'
                 )}
@@ -140,8 +142,8 @@ export function TabComponent({ tabs, activeTabId, onTabChange, className, style 
                   paddingLeft: '16px',
                   paddingRight: '16px',
                   ...(isEnabled ? {
-                    color: '#2478CC',
-                    borderBottomColor: isActive ? '#2478CC' : 'transparent',
+                    color: '#1159A7',
+                    borderBottomColor: isActive ? '#1159A7' : 'transparent',
                     lineHeight: 'normal',
                   } : {
                     color: '#696969',
@@ -151,7 +153,7 @@ export function TabComponent({ tabs, activeTabId, onTabChange, className, style 
                 }}
                 onMouseEnter={(e) => {
                   if (isEnabled && !isActive) {
-                    e.currentTarget.style.borderBottomColor = '#2478CC'
+                    e.currentTarget.style.borderBottomColor = '#1159A7'
                   }
                 }}
                 onMouseLeave={(e) => {

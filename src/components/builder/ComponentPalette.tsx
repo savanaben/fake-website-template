@@ -9,8 +9,12 @@ interface ComponentPaletteProps {
 }
 
 const componentTypes: Array<{ type: ComponentType; label: string; category: string; isCrossTab?: boolean }> = [
+  { type: 'sidebarPage', label: 'Sidebar Page', category: 'Sidebar' },
+  { type: 'sidebarColumn', label: 'Sidebar Column', category: 'Sidebar' },
+  { type: 'sidebarContent', label: 'Sidebar Content', category: 'Sidebar' },
   { type: 'flexContainer', label: 'Flex Container', category: 'Layout' },
   { type: 'column', label: 'Column', category: 'Layout' },
+  { type: 'card', label: 'Card', category: 'Content' },
   { type: 'title', label: 'Title', category: 'Content' },
   { type: 'paragraph', label: 'Paragraph', category: 'Content' },
   { type: 'image', label: 'Image', category: 'Content' },
@@ -21,6 +25,7 @@ const componentTypes: Array<{ type: ComponentType; label: string; category: stri
 ]
 
 export function ComponentPalette({ onAddComponent, onDragStart, onDragEnd }: ComponentPaletteProps) {
+  const sidebarComponents = componentTypes.filter((c) => c.category === 'Sidebar')
   const layoutComponents = componentTypes.filter((c) => c.category === 'Layout')
   const contentComponents = componentTypes.filter((c) => c.category === 'Content')
   const websiteSpecificComponents = componentTypes.filter((c) => c.category === 'Website Specific Components')
@@ -43,6 +48,27 @@ export function ComponentPalette({ onAddComponent, onDragStart, onDragEnd }: Com
       <h3 className="text-lg font-semibold">Components</h3>
       
       <div className="space-y-3">
+        {sidebarComponents.length > 0 && (
+          <div>
+            <h4 className="text-sm font-medium text-gray-600 mb-2">Sidebar</h4>
+            <div className="space-y-2">
+              {sidebarComponents.map((comp, index) => (
+                <Button
+                  key={`${comp.type}-${comp.category}-${index}`}
+                  variant="outline"
+                  className="w-full justify-start cursor-move"
+                  onClick={() => onAddComponent(comp.type, comp.isCrossTab)}
+                  draggable
+                  onDragStart={(e) => handleDragStart(e, comp.type, comp.isCrossTab)}
+                  onDragEnd={handleDragEnd}
+                >
+                  {comp.label}
+                </Button>
+              ))}
+            </div>
+          </div>
+        )}
+
         {websiteSpecificComponents.length > 0 && (
           <div>
             <h4 className="text-sm font-medium text-gray-600 mb-2">Website Specific Components</h4>

@@ -5,6 +5,7 @@ interface ColumnProps {
   children: ReactNode
   className?: string
   width?: string
+  maxWidthMode?: 'default' | 'full'
   isEmpty?: boolean
   hasPadding?: boolean
   onDragOver?: (e: React.DragEvent) => void
@@ -16,6 +17,7 @@ export function Column({
   children, 
   className, 
   width,
+  maxWidthMode = 'default',
   isEmpty = false,
   hasPadding = true,
   onDragOver,
@@ -53,7 +55,8 @@ export function Column({
   return (
     <div 
       className={cn(
-        'min-h-[30px] max-w-[900px]',
+        'min-h-[30px]',
+        maxWidthMode === 'default' && 'max-w-[900px]',
         hasPadding && 'p-6',
         widthClass,
         (!hasChildren || isEmpty) && 'border-2 border-dashed border-gray-300 rounded-lg',

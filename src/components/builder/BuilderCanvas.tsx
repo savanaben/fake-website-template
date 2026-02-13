@@ -22,6 +22,8 @@ interface BuilderCanvasProps {
   tabSticky?: boolean
   tabIconUrl?: string
   tabIconAlt?: string
+  hideTabBar?: boolean
+  hideToolbar?: boolean
 }
 
 
@@ -39,6 +41,8 @@ export function BuilderCanvas({
   tabSticky = false,
   tabIconUrl,
   tabIconAlt,
+  hideTabBar = false,
+  hideToolbar = false,
 }: BuilderCanvasProps) {
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault()
@@ -104,17 +108,23 @@ export function BuilderCanvas({
 
       const newHeights = { ...heights }
 
-      // Measure Toolbar - find the sticky element with z-20 (first sticky element)
-      const allSticky = containerRef.current.querySelectorAll('.sticky')
-      const toolbar = Array.from(allSticky).find(el => {
-        const zIndex = window.getComputedStyle(el).zIndex
-        return zIndex === '20'
-      }) as HTMLElement
-      if (toolbar) {
-        newHeights.toolbar = toolbar.getBoundingClientRect().height
+      // When toolbar is hidden, its height is 0 for sticky offset calculations
+      if (hideToolbar) {
+        newHeights.toolbar = 0
+      } else {
+        // Measure Toolbar - find the sticky element with z-20 (first sticky element)
+        const allSticky = containerRef.current.querySelectorAll('.sticky')
+        const toolbar = Array.from(allSticky).find(el => {
+          const zIndex = window.getComputedStyle(el).zIndex
+          return zIndex === '20'
+        }) as HTMLElement
+        if (toolbar) {
+          newHeights.toolbar = toolbar.getBoundingClientRect().height
+        }
       }
 
-      // Measure FillerTabBar - find sticky element with z-10
+      // Measure FillerTabBar - find sticky element with z-10 (only when toolbar is rendered)
+      const allSticky = containerRef.current.querySelectorAll('.sticky')
       const fillerTabBar = Array.from(allSticky).find(el => {
         const zIndex = window.getComputedStyle(el).zIndex
         return zIndex === '10'
@@ -177,7 +187,7 @@ export function BuilderCanvas({
       clearTimeout(timeoutId)
       window.removeEventListener('resize', measureHeights)
     }
-  }, [fakeURLBarComponents, websiteHeaderBarComponents, tabSticky, heights.toolbar, heights.fillerTabBar, heights.urlBar, heights.headerBar])
+  }, [hideToolbar, fakeURLBarComponents, websiteHeaderBarComponents, tabSticky, heights.toolbar, heights.fillerTabBar, heights.urlBar, heights.headerBar])
 
   // Sort tabs by position before creating tab data
   const sortedTabs = [...tabs].sort((a, b) => (a.position || 0) - (b.position || 0))
@@ -221,12 +231,13 @@ export function BuilderCanvas({
     >
       <Container>
         <div ref={containerRef} className="space-y-0">
-          {/* Toolbars at the top - always visible */}
-          <Toolbar variant="primary" />
-          <FillerTabBar />
+          {/* Toolbar - hidden when hideToolbar (e.g., Sidebar example) */}
+          {!hideToolbar && <Toolbar variant="primary" />}
+          {/* FillerTabBar - hide when hideTabBar (e.g., Card example) */}
+          {!hideTabBar && <FillerTabBar />}
           
           {/* FakeURLBar components - rendered above tabs */}
-          {fakeURLBarComponents.map((component) => {
+          {!hideTabBar && fakeURLBarComponents.map((component) => {
             const urlBarSticky = component.props.urlBarSticky === true
             return (
               <React.Fragment key={component.id}>
@@ -245,7 +256,7 @@ export function BuilderCanvas({
           })}
           
           {/* WebsiteHeaderBar components - rendered above tabs */}
-          {websiteHeaderBarComponents.map((component) => {
+          {!hideTabBar && websiteHeaderBarComponents.map((component) => {
             const headerBarSticky = component.props.headerBarSticky === true
             return (
               <React.Fragment key={component.id}>
@@ -264,7 +275,8 @@ export function BuilderCanvas({
           })}
           
           <div className="space-y-4">
-            {/* Tabs - always show tabs */}
+            {/* Tabs - show tabs unless hideTabBar */}
+            {!hideTabBar && (
             <div className="mb-6">
               <TabComponent
                 tabs={tabData}
@@ -277,6 +289,12 @@ export function BuilderCanvas({
                 iconAlt={tabIconAlt}
               />
             </div>
+            )}
+            {hideTabBar && (
+              <div className="">
+                {tabData.find((t) => t.id === activeTabId)?.content}
+              </div>
+            )}
           </div>
         </div>
       </Container>

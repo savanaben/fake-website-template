@@ -9,7 +9,11 @@ import { BannerImageComponent } from '@/components/content/BannerImageComponent'
 import { WebsiteHeaderBar } from '@/components/content/WebsiteHeaderBar'
 import { FlexContainer } from '@/components/layout/FlexContainer'
 import { Column } from '@/components/layout/Column'
+import { CardComponent } from '@/components/content/CardComponent'
 import { FakeURLBar } from '@/components/layout/FakeURLBar'
+import { SidebarPage } from '@/components/layout/SidebarPage'
+import { SidebarColumn } from '@/components/layout/SidebarColumn'
+import { SidebarContent } from '@/components/layout/SidebarContent'
 
 interface RenderComponentProps {
   component: WebsiteComponent
@@ -192,6 +196,8 @@ export function renderComponent({
         >
           <FlexContainer 
             gap={component.props.gap}
+            direction={component.props.flexDirection || 'row'}
+            maxWidthMode={component.props.flexContainerMaxWidth || 'default'}
             columnDistribution={distribution}
             isEmpty={!component.children || component.children.length === 0}
             onDragOver={handleFlexDragOver}
@@ -274,6 +280,7 @@ export function renderComponent({
       return (
         <Column 
           width={columnWidth}
+          maxWidthMode={component.props.columnMaxWidth || 'default'}
           isEmpty={!component.children || component.children.length === 0}
           hasPadding={component.props.columnHasPadding !== false}
           onDragOver={handleColumnDragOver}
@@ -285,6 +292,46 @@ export function renderComponent({
             ? renderChildren(component.children)
             : null}
         </Column>
+      )
+
+    case 'card':
+      const handleCardDragOver = (e: React.DragEvent) => {
+        e.preventDefault()
+        e.stopPropagation()
+        e.dataTransfer.dropEffect = 'move'
+        onDragOver?.(e, component.id)
+      }
+
+      const handleCardDrop = (e: React.DragEvent) => {
+        e.preventDefault()
+        e.stopPropagation()
+        const componentType = e.dataTransfer.getData('componentType')
+        if (componentType && onDrop && (componentType === 'title' || componentType === 'paragraph')) {
+          onDrop(e, componentType, component.id)
+        }
+      }
+
+      return (
+        <div {...commonProps}>
+          <CardComponent
+            rounding={component.props.cardRounding || 'medium'}
+            shadow={component.props.cardShadow || 'none'}
+            backgroundColor={component.props.cardBackgroundColor || '#ffffff'}
+            borderColor={component.props.cardBorderColor}
+            border={component.props.cardBorder || 'none'}
+            width={component.props.cardWidth || 'default'}
+            widthManual={component.props.cardWidthManual}
+            padding={component.props.cardPadding || 'space-24'}
+            isEmpty={!component.children || component.children.length === 0}
+            onDragOver={handleCardDragOver}
+            onDrop={handleCardDrop}
+            onClick={commonProps.onClick}
+          >
+            {component.children && renderChildren
+              ? renderChildren(component.children)
+              : null}
+          </CardComponent>
+        </div>
       )
 
     case 'websiteHeaderBar':
@@ -311,6 +358,90 @@ export function renderComponent({
             visible={component.props.visible !== false}
           />
         </div>
+      )
+
+    case 'sidebarPage': {
+      const handleSidebarPageDragOver = (e: React.DragEvent) => {
+        e.preventDefault()
+        e.stopPropagation()
+        e.dataTransfer.dropEffect = 'move'
+        onDragOver?.(e, component.id)
+      }
+      const handleSidebarPageDrop = (e: React.DragEvent) => {
+        e.preventDefault()
+        e.stopPropagation()
+        const componentType = e.dataTransfer.getData('componentType')
+        if (componentType && onDrop) {
+          onDrop(e, componentType, component.id)
+        }
+      }
+      return (
+        <div {...commonProps}>
+          <SidebarPage
+            isEmpty={!component.children || component.children.length === 0}
+            onDragOver={handleSidebarPageDragOver}
+            onDrop={handleSidebarPageDrop}
+            onClick={commonProps.onClick}
+          >
+            {component.children && renderChildren
+              ? renderChildren(component.children)
+              : null}
+          </SidebarPage>
+        </div>
+      )
+    }
+
+    case 'sidebarColumn': {
+      const handleSidebarColDragOver = (e: React.DragEvent) => {
+        e.preventDefault()
+        e.stopPropagation()
+        e.dataTransfer.dropEffect = 'move'
+        onDragOver?.(e, component.id)
+      }
+      const handleSidebarColDrop = (e: React.DragEvent) => {
+        e.preventDefault()
+        e.stopPropagation()
+        const componentType = e.dataTransfer.getData('componentType')
+        if (componentType && onDrop) {
+          onDrop(e, componentType, component.id)
+        }
+      }
+      return (
+        <SidebarColumn
+          width={component.props.sidebarColumnWidth}
+          bgColor={component.props.sidebarColumnBgColor}
+          bgImage={component.props.sidebarColumnBgImage}
+          bgImageRepeat={component.props.sidebarColumnBgImageRepeat}
+          bgImageSize={component.props.sidebarColumnBgImageSize}
+          bgImagePosition={component.props.sidebarColumnBgImagePosition}
+          isEmpty={!component.children || component.children.length === 0}
+          onDragOver={handleSidebarColDragOver}
+          onDrop={handleSidebarColDrop}
+          onClick={commonProps.onClick}
+          className={commonProps.className}
+        >
+          {component.children && renderChildren
+            ? renderChildren(component.children)
+            : null}
+        </SidebarColumn>
+      )
+    }
+
+    case 'sidebarContent':
+      return (
+        <SidebarContent
+          bgColor={component.props.sidebarContentBgColor}
+          verticalAlign={component.props.sidebarContentVerticalAlign}
+          image={component.props.sidebarContentImage}
+          imagePosition={component.props.sidebarContentImagePosition}
+          imageRepeat={component.props.sidebarContentImageRepeat}
+          imageSize={component.props.sidebarContentImageSize}
+          height={component.props.sidebarContentHeight}
+          sticky={component.props.sidebarContentSticky}
+          stickyEdge={component.props.sidebarContentStickyEdge}
+          onClick={commonProps.onClick}
+          className={commonProps.className}
+        />
       )
 
     default:

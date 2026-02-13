@@ -5,6 +5,8 @@ interface FlexContainerProps {
   children: ReactNode
   className?: string
   gap?: string
+  direction?: 'row' | 'column'
+  maxWidthMode?: 'default' | 'full'
   columnDistribution?: string
   isEmpty?: boolean
   onDragOver?: (e: React.DragEvent) => void
@@ -15,6 +17,8 @@ export function FlexContainer({
   children, 
   className, 
   gap = 'gap-4',
+  direction = 'row',
+  maxWidthMode = 'default',
   columnDistribution: _columnDistribution, // Used by parent componentFactory
   isEmpty = false,
   onDragOver,
@@ -26,6 +30,8 @@ export function FlexContainer({
     <div 
       className={cn(
         'flex w-full min-h-[30px] p-6',
+        direction === 'column' ? 'flex-col' : 'flex-row',
+        maxWidthMode === 'default' && 'max-w-[900px] mx-auto',
         (!hasChildren || isEmpty) && 'border-2 border-dashed border-gray-300 rounded-lg',
         gap, 
         className

@@ -234,10 +234,28 @@ export function useWebsiteBuilder() {
         }
       case 'fakeURLBar':
         return { ...baseProps, urlText: 'https://example.com', visible: true }
+      case 'card':
+        return {
+          ...baseProps,
+          cardType: 'overBackground',
+          cardRounding: 'large',
+          cardShadow: 'high',
+          cardBackgroundColor: '#ffffff',
+          cardBorderColor: '#909090',
+          cardBorder: 'thin',
+          cardWidth: 'default',
+          cardPadding: 'space-24',
+        }
       case 'flexContainer':
-        return { ...baseProps, gap: 'gap-4', columnDistribution: '1:1' }
+        return { ...baseProps, gap: 'gap-4', flexDirection: 'row', flexContainerMaxWidth: 'default', columnDistribution: '1:1' }
       case 'column':
         return { ...baseProps }
+      case 'sidebarPage':
+        return { ...baseProps }
+      case 'sidebarColumn':
+        return { ...baseProps, sidebarColumnWidth: '200px' }
+      case 'sidebarContent':
+        return { ...baseProps, sidebarContentHeight: 'grow', sidebarContentVerticalAlign: 'start', sidebarContentImageRepeat: 'no-repeat', sidebarContentImageSize: 'cover' }
       default:
         return { ...baseProps }
     }
@@ -255,7 +273,7 @@ export function useWebsiteBuilder() {
       id: generateId(),
       type,
       props: { ...defaultProps, ...props },
-      children: type === 'flexContainer' || type === 'column' ? [] : undefined,
+      children: ['flexContainer', 'column', 'card', 'sidebarPage', 'sidebarColumn'].includes(type) ? [] : undefined,
     }
 
     setWebsiteData((prev) => {
@@ -614,6 +632,8 @@ export function useWebsiteBuilder() {
       tabSticky: template.tabSticky,
       tabIconUrl: template.tabIconUrl,
       tabIconAlt: template.tabIconAlt,
+      hideTabBar: template.hideTabBar,
+      hideToolbar: template.hideToolbar,
     })
     setIsTemplateMode(true)
   }, [])

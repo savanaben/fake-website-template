@@ -1,6 +1,153 @@
 {
   "configs": [
     {
+      "name": "Card example",
+      "data": {
+        "crossTabComponents": [],
+        "hideTabBar": true,
+        "tabs": [
+          {
+            "id": "tab-card-example",
+            "label": "Card Example",
+            "enabled": true,
+            "position": 1,
+            "content": [
+              {
+                "id": "flex-container-card-example",
+                "type": "flexContainer",
+                "props": {
+                  "gap": "gap-4",
+                  "flexDirection": "column",
+                  "flexContainerMaxWidth": "full",
+                  "columnDistribution": "1:1",
+                  "enabled": true
+                },
+                "children": [
+                  {
+                    "id": "column-1",
+                    "type": "column",
+                    "props": {
+                      "columnMaxWidth": "full",
+                      "columnHasPadding": true,
+                      "enabled": true
+                    },
+                    "children": [
+                      {
+                        "id": "card-over-background",
+                        "type": "card",
+                        "props": {
+                          "cardType": "overBackground",
+                          "cardRounding": "large",
+                          "cardShadow": "high",
+                          "cardBackgroundColor": "#ffffff",
+                          "cardBorder": "thin",
+                          "cardWidth": "default",
+                          "cardPadding": "space-32",
+                          "enabled": true
+                        },
+                        "children": [
+                          {
+                            "id": "card-ob-title",
+                            "type": "title",
+                            "props": {
+                              "title": "Featured Article",
+                              "headingLevel": "h3",
+                              "enabled": true
+                            }
+                          },
+                          {
+                            "id": "card-ob-para",
+                            "type": "paragraph",
+                            "props": {
+                              "content": "This card uses the overBackground style with large rounding, high shadow, and high padding. It appears prominently over the page content.",
+                              "enabled": true
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "id": "column-2",
+                    "type": "column",
+                    "props": {
+                      "columnMaxWidth": "default",
+                      "columnHasPadding": true,
+                      "enabled": true
+                    },
+                    "children": [
+                      {
+                        "id": "h2-related",
+                        "type": "h2",
+                        "props": {
+                          "text": "Related Content",
+                          "enabled": true
+                        }
+                      },
+                      {
+                        "id": "card-inline",
+                        "type": "card",
+                        "props": {
+                          "cardType": "inline",
+                          "cardRounding": "medium",
+                          "cardShadow": "none",
+                          "cardBackgroundColor": "#ffffff",
+                          "cardBorder": "thick",
+                          "cardWidth": "default",
+                          "cardPadding": "space-24",
+                          "enabled": true
+                        },
+                        "children": [
+                          {
+                            "id": "card-inline-title",
+                            "type": "title",
+                            "props": {
+                              "title": "Additional Information",
+                              "headingLevel": "h3",
+                              "enabled": true
+                            }
+                          },
+                          {
+                            "id": "card-inline-para",
+                            "type": "paragraph",
+                            "props": {
+                              "content": "This card uses the inline style with medium rounding, no shadow, and a border. It flows with the surrounding content.",
+                              "enabled": true
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "id": "paragraph-dummy-1",
+                        "type": "paragraph",
+                        "props": {
+                          "content": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.",
+                          "enabled": true
+                        }
+                      },
+                      {
+                        "id": "paragraph-dummy-2",
+                        "type": "paragraph",
+                        "props": {
+                          "content": "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
+                          "enabled": true
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "activeTabId": "tab-card-example",
+        "tabStyle": "line",
+        "tabSticky": false,
+        "tabIconUrl": null,
+        "tabIconAlt": null
+      }
+    },
+    {
       "name": "Full Features Usage",
       "data": {
         "crossTabComponents": [
@@ -306,6 +453,132 @@
         "tabSticky": true,
         "tabIconUrl": "/assets/images/people.png",
         "tabIconAlt": "Tab icon"
+      }
+    },
+    {
+      "name": "Sidebar Example",
+      "data": {
+        "crossTabComponents": [],
+        "hideTabBar": true,
+        "hideToolbar": true,
+        "tabs": [
+          {
+            "id": "tab-sidebar-example",
+            "label": "Sidebar Example",
+            "enabled": true,
+            "position": 1,
+            "content": [
+              {
+                "id": "sidebar-page-root",
+                "type": "sidebarPage",
+                "props": {
+                  "name": "Sidebar Page",
+                  "enabled": true
+                },
+                "children": [
+                  {
+                    "id": "sidebar-col-left",
+                    "type": "sidebarColumn",
+                    "props": {
+                      "sidebarColumnWidth": "200px",
+                      "sidebarColumnBgColor": "#e8f0fe",
+                      "name": "Left Sidebar",
+                      "enabled": true
+                    },
+                    "children": [
+                      {
+                        "id": "sidebar-content-left-1",
+                        "type": "sidebarContent",
+                        "props": {
+                          "sidebarContentBgColor": "#c2d9f7",
+                          "sidebarContentHeight": "grow",
+                          "sidebarContentVerticalAlign": "start",
+                          "name": "Left Content",
+                          "enabled": true
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "id": "passage-flex-container",
+                    "type": "flexContainer",
+                    "props": {
+                      "gap": "gap-4",
+                      "flexDirection": "column",
+                      "flexContainerMaxWidth": "full",
+                      "columnDistribution": "1",
+                      "name": "Passage Area",
+                      "enabled": true
+                    },
+                    "children": [
+                      {
+                        "id": "passage-column",
+                        "type": "column",
+                        "props": {
+                          "columnMaxWidth": "full",
+                          "columnHasPadding": true,
+                          "name": "Passage Column",
+                          "enabled": true
+                        },
+                        "children": [
+                          {
+                            "id": "passage-title",
+                            "type": "title",
+                            "props": {
+                              "title": "Passage Title",
+                              "headingLevel": "h1",
+                              "enabled": true
+                            }
+                          },
+                          {
+                            "id": "passage-para-1",
+                            "type": "paragraph",
+                            "props": {
+                              "content": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
+                              "enabled": true
+                            }
+                          },
+                          {
+                            "id": "passage-para-2",
+                            "type": "paragraph",
+                            "props": {
+                              "content": "Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt.",
+                              "enabled": true
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "id": "sidebar-col-right",
+                    "type": "sidebarColumn",
+                    "props": {
+                      "sidebarColumnWidth": "200px",
+                      "sidebarColumnBgColor": "#fef3e8",
+                      "name": "Right Sidebar",
+                      "enabled": true
+                    },
+                    "children": [
+                      {
+                        "id": "sidebar-content-right-1",
+                        "type": "sidebarContent",
+                        "props": {
+                          "sidebarContentBgColor": "#fde0c2",
+                          "sidebarContentHeight": "grow",
+                          "sidebarContentVerticalAlign": "start",
+                          "name": "Right Content",
+                          "enabled": true
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "activeTabId": "tab-sidebar-example"
       }
     }
   ]
